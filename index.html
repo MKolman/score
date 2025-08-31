@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volleyball score</title>
+    <script>
+        // Replace with your public Google Sheets ID and sheet name
+        const SHEET_ID = '1VNqfhGG8kSwXiOOG8UsInMKyoKembhZezpYFqSmrH6c';
+        const SHEET_GID = '0';
+
+        async function fetchSheetData() {
+            // const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+            // const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sheet1&gid=0`
+            console.log('Fetching data from:', url);
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const [_, scores, __, sets] = text.split("\n")
+                const result =  [scores.split(",").map(x => parseInt(x)), sets.split(",").map(x => parseInt(x))];
+                console.log(scores, sets, result);
+                return result;
+            } catch (error) {
+                console.error('Error fetching sheet:', error);
+            }
+        }
+
+        // Call the function on page loadu
+        let [scores, sets] = [0, 0];
+
+        function draw() {
+            document.getElementById("score1").innerText = scores[0];
+            document.getElementById("score2").innerText = scores[1];
+            document.getElementById("set1").children[1].innerText = sets[0];
+            document.getElementById("set2").children[1].innerText = sets[1];
+        }
+
+        async function update() {
+            [scores, sets] = await fetchSheetData();
+            draw();
+        }
+        update();
+        setInterval(update, 5000);
+    </script>
+    <style>
+        #score1, #score2 {
+            font-weight: bold;
+            /* margin: 0 20px; */
+            background-color: #fd4e0d;
+            width: 55px;
+            display: inline-flex;
+            justify-content: center;
+            height: 55px;
+            border: 2px solid;
+            border-color: #fd4e0d;
+            vertical-align: middle;
+        }
+        #set1, #set2 {
+            font-weight: bold;
+            /* margin: 0 20px; */
+            border: 2px solid;
+            border-color: #fd4e0d;
+            width: 55px;
+            display: inline-flex;
+            justify-content: center;
+            vertical-align: middle;
+            align-items: center;
+            height: 55px;
+            flex-direction: column;
+        }
+        .txt{
+            font-size: 20px;
+            font-weight: normal;
+        }
+        .set{
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div style="background: #0e1f2d; color: white; font-size: 48px; text-align: center; padding: 20px; font-family: sans-serif">
+        <span>KOLMAN/KOLMAN</span>
+        <span id="set1"><span class="txt">sets</span><span class="set">0</span></span><span id="score1">0</span>
+        :
+        <span id="score2">0</span><span id="set2"><span class="txt">sets</span><span class="set">0</span></span>
+        <span>JAVORNIK/LOVSIN</span>
+    </div>
+</body>
+</html>
